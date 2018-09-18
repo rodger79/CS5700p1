@@ -21,8 +21,13 @@ int main() {
 	ifstream inputFile;
 	inputFile.open(srcFileLocation + "input.txt");
 
+	char* inputString;
+
 	if (inputFile){
 		cout << "file opened" << endl;
+		while (inputFile.getline()){
+
+		}
 	}else{
 		cout << "cannot open file" << endl;
 	}
