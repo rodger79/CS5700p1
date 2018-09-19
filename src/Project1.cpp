@@ -9,29 +9,45 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <vector>
+
 
 using namespace std;
 
-const char* srcFileLocation = "/home/rodger/school/cs5700/pj1/src/PJ01_runfiles/";
+const char* srcFileLocation = "/home/rodger/school/CS5700/pj1/src/PJ01_runfiles/input.txt";
+
 const char* dstFileLocation = "/home/rodger/school/cs5700/pj1/src/outputfiles/";
 
 int main() {
-
+	
+	//define vector to hold test strings
+	vector <string> testStringsList;
+	testStringsList.clear();
+	
     //open input string file
-	ifstream inputFile;
-	inputFile.open(srcFileLocation + "input.txt");
+	ifstream inputFile(srcFileLocation);
 
-	char* inputString;
-
+	
+	//test inputfile
 	if (inputFile){
 		cout << "file opened" << endl;
-		while (inputFile.getline()){
-
-		}
 	}else{
 		cout << "cannot open file" << endl;
+		
 	}
-
-	cout << "!!!Hello World!!!" << endl; // prints !!!Hello World!!!
+	
+	string temp;
+	//read inputfile
+	while(!inputFile.eof()){
+		inputFile>>temp; 
+		testStringsList.push_back(temp);
+	}
+	
+	//read out input strings
+	for (int i = 0; i < testStringsList.size(); i++){
+		cout << testStringsList[i] << "\n";
+	}
+	
 	return 0;
 }
+
