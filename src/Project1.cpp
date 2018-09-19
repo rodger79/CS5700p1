@@ -4,6 +4,7 @@
 // Name: 				Rodger Byrd
 // Function: 			Read in Machine files consecutively
 //						Read in strings
+//						update...
 //============================================================================
 
 #include <iostream>
@@ -16,9 +17,9 @@
 using namespace std;
 
 //const char* inputLocation = "/home/rodger/school/CS5700/pj1/src/PJ01_runfiles/input.txt";
-const string inputLocation = "/home/rodger/school/CS5700/pj1/src/PJ01_runfiles/input.txt";
-const string mdfLocation = "/home/rodger/school/CS5700/pj1/src/PJ01_runfiles/";
-const string dstFileLocation = "/home/rodger/school/cs5700/pj1/src/outputfiles/";
+const string inputLocation = 	"/home/rodger/school/CS5700/pj1/src/PJ01_runfiles/input.txt";
+const string mdfLocation = 		"/home/rodger/school/CS5700/pj1/src/PJ01_runfiles/";
+const string dstFileLocation = 	"/home/rodger/school/cs5700/pj1/src/outputfiles/";
 
 int main() {
 	
@@ -32,7 +33,7 @@ int main() {
 	
 	//test inputfile opens correctly
 	if (inputFile){
-		cout << "file opened" << endl;
+		cout << "input file opened" << endl;
 	}else{
 		cout << "cannot open file" << endl;
 		throw exception();
@@ -68,14 +69,14 @@ int main() {
 		else{
 			filename = mdfLocation + "m" + fileNum + ".fa";
 		}
-		cout << filename << "\n";
+		//cout << filename << "\n";
 		
 	    //open input string file
-		//ifstream inputFile();
+		ifstream mdfFile(filename.c_str());
 		
 		//If valid open MDF and create logfile
-		if (true){
-			
+		if (mdfFile){
+			cout << "mdf: " + filename + " opened" << endl;
 		} 
 		//no more mdfs exist break loop
 		else {
