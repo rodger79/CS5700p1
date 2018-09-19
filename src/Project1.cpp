@@ -33,11 +33,11 @@ int main() {
 		cout << "file opened" << endl;
 	}else{
 		cout << "cannot open file" << endl;
-		
+		throw exception();
 	}
 	
-	string temp;
 	//read inputfile
+	string temp;
 	while(!inputFile.eof()){
 		inputFile>>temp; 
 		testStringsList.push_back(temp);
@@ -45,8 +45,14 @@ int main() {
 	
 	//read out input strings
 	for (int i = 0; i < testStringsList.size(); i++){
-		cout << testStringsList[i] << "\n";
+		//cout << testStringsList[i] << "\n";
+		//check to make sure no strings are reduced by char limit
+		if (testStringsList[i].size() >= 255)
+		{
+			cout << "size limit warning" << "\n";
+		}
 	}
+	
 	
 	return 0;
 }
