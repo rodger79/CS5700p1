@@ -140,26 +140,27 @@ int main() {
 					//error here- uninitialized causing seg fault?
 					char* nums;
 					nums = strtok(tempCharAr,",");
-					//char* tranStates[2]; 					
+					char tranStates[2]; 					
 					int j = 0;
 					while (nums != NULL){
 						//printf ("%s\n",nums);
-						//tranStates[j] = nums;
+						tranStates[j] = *nums;
 						nums = strtok (NULL, ",");
 						j++;
 					}
-					/*
+					
 					transition tempTransition;
-					tempTransition.start = atoi(tranStates[0]);
+					tempTransition.start = atoi(&tranStates[0]);
 					tempTransition.character = tranStates[1];
-					tempTransition.end = atoi(tranStates[2]);
+					tempTransition.end = atoi(&tranStates[2]);
 					//cout<<"Add transition\n" ;
 					transitionList.push_back(tempTransition);
-					*/
+					
 				}
 				i++;
 				
 			}
+			
 			/*
 			//test accept list
 			cout << "accept list"  << "\n";
@@ -170,9 +171,9 @@ int main() {
 						cout << acceptList[i] << "\n";
 				}
 			}	
-			*/
 			
-			/*
+			
+			
 			//test transition list
 			cout << "transition list: start, char, end"  << "\n";
 			if (acceptList.empty()){
@@ -187,7 +188,7 @@ int main() {
 				}
 				
 			}
-			 */
+			*/
 		
 			//loop through test strings and test in current machine
 			/*
