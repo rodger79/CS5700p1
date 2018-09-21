@@ -13,6 +13,7 @@
 #include <vector>
 #include <cstdlib>
 #include <cstring>
+#include <algorithm>
 
 using namespace std;
 
@@ -27,6 +28,42 @@ struct transition{
 	int end;
 };
 
+string remove_duplicates(std::string s) {
+    if (s.begin() == s.end()) return s;
+    auto no_duplicates = s.begin(); 
+    for (auto current = no_duplicates; current != s.end();) {
+        current = std::find_if(std::next(current), s.end(), [no_duplicates](const char c) { return c != *no_duplicates; });
+        *++no_duplicates = std::move(*current);;
+    }
+    s.erase(++no_duplicates, s.end());
+    return s;
+}
+
+bool accept_string(string curString, vector<int>& accList, vector<transition>& TransList){
+	bool retval = false;
+	//start state
+	int state = 0;
+	
+	//step through string characters
+	for (int i = 0; i < curString.length(); i++){
+		string currentSymbol = &curString[i];
+		//look for transition from current state with current symbol
+		//cout << "i: " << i << " char: " << curString[i] <<"\n";
+		for (int j = 0; j < TransList.size(); j++){
+			if (TransList[j].start == state && TransList[j].character == currentSymbol){
+				state = TransList[j].end;
+			}
+		}
+	}
+	for (int j = 0; j < accList.size(); j++){
+		if(accList[j] == state){
+			retval = true;
+		}
+	}
+	
+
+	return retval;
+}
 int main() {
 	
 	//define vector to hold test strings
@@ -75,10 +112,9 @@ int main() {
 	
 	//open Machine Description Files loop
 	int mdfCount = 0;
-	bool mdfValid = true; 
-	cout<<"test1"<<"\n";
+	//cout<<"test1"<<"\n";
 	while (true){
-		cout<<"test2"<<"\n";
+		//cout<<"test2"<<"\n";
 		string filename = "";
 		string logfile = "";
 		string fileNum = to_string(mdfCount);
@@ -104,9 +140,9 @@ int main() {
 		ifstream mdfFile(filename.c_str());
 		
 		//If valid open MDF 
-		cout<<"test3"<<"\n";
+		//cout<<"test3"<<"\n";
 		if (mdfFile){   									
-			cout<<"test4"<<"\n";
+			//cout<<"test4"<<"\n";
 			//cout << "mdf: " + filename + " opened" << endl;
 			//Load MDF into memory
 			cout << "mdf test: " + filename + " opened" << endl;
@@ -189,13 +225,92 @@ int main() {
 				
 			}
 			*/
-		
-			//loop through test strings and test in current machine
-			/*
-			for (int i = 0; i < testStringsList.size(); i++){
-				string currentString = testStringsList[i];
+			//determine if machine is DFA/NFA/INVALID
+			//look for epsilon transitions
+			bool hasEpsilon = false;
+			string epsilon = "`";
+			for (int i = 0; i < transitionList.size(); i++){
+				if (transitionList[i].character == epsilon){
+					//cout<< "hasEpsilon" << "\n";
+					hasEpsilon = true;
+				}
+			}
+			//else look for multiple transitions rules for same state/symbol
+			bool hasMatch = false;
+			for (int i = 0; i < transitionList.size(); i++){
+				string currentSymbol;
+				int currentState;
+				currentSymbol = transitionList[i].character;
+				currentState = transitionList[i].start;
+				//look for repeats of state/symbol combination
+				int count = 0;
+				for (int j = 0; j < transitionList.size(); j++){
+					if ((transitionList[j].character == currentSymbol) 
+							&& (transitionList[j].start == currentState)){
+						count++;
+						
+					}
+				}
+				//if count > 1 multiple staty/symbols identified
+				if (count > 1){
+					hasMatch = true;
+					//cout<< "currentState " << currentState <<"\n";
+					//cout<< "currentSymbol " << currentSymbol <<"\n";
 
-			}*/
+				}
+			}
+			bool NFA = false;
+			//if Epsilon or matching symbol/stated identified NFA
+			if (hasEpsilon || hasMatch){
+				log << "Valid: NFA" << "\n";
+				cout<< "hasEpsilon or symbol/state repeat" << "\n";
+				NFA = true;
+			}else{
+				log << "Valid: DFA" << "\n";
+			}
+			//else invalid, tokenizer should handle missing tokens
+			
+			//identify machine alphabet
+			string Alphabet;
+			for (int i = 0; i < transitionList.size(); i++){
+				if (transitionList[i].character == "`"){
+					//don't add epsilon character to alphabet
+				}else{
+					Alphabet += transitionList[i].character;
+				}
+					
+				
+			}
+			/* debug
+			cout<< Alphabet<< "\n";
+			cout<<remove_duplicates(Alphabet)<< "\n";
+			*/
+			sort(Alphabet.begin(), Alphabet.end());
+			string finalAlphabet = remove_duplicates(Alphabet);
+			cout<< finalAlphabet<< "\n";
+			log << "Alphabet: " << finalAlphabet << "\n";
+			
+			//loop through test strings and test in current machine
+			for (int i = 0; i < testStringsList.size(); i++){
+				if (NFA){
+					//ignore NFA for now
+					break;
+				}
+				
+				string currentString = testStringsList[i];
+				//cout<<currentString<< "\n";
+				bool stringPasses;
+				stringPasses = accept_string(currentString, acceptList,transitionList);
+
+				if (stringPasses){
+					cout<<"pass string: "<< currentString << "\n";
+					log<<currentString<< "\n";
+				} else{
+					//cout<<"fail string: "<< currentString << "\n";
+				}
+				
+
+			}
 			
 			//close MDF & logfile & clear acceptlist
 			log.close();
@@ -206,18 +321,16 @@ int main() {
 		}  
 		else {
 			break;
-			//mdfValid = false;
 		}
 
-		cout << "test5"  << "\n";	
+		//cout << "test5"  << "\n";	
 
 		//prevent infinite loop
-		if (mdfCount == 2){ 
-			//break;
-			//mdfValid = false;
+		if (mdfCount == 4){ 
+			break;
 		}
 		mdfCount++;
-		cout << "test6"  << "\n";
+		//cout << "test6"  << "\n";
 	}
 	
 	return 0;
