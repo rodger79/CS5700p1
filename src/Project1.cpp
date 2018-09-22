@@ -19,15 +19,19 @@ using namespace std;
 
 //absolute directory locations
 const string inputLocation = 	"/home/rodger/school/CS5700/pj1/src/PJ01_runfiles/input.txt";
+//const string inputLocation = 	"/home/rodger/school/CS5700/pj1/src/PJ01_runfiles/inputtoy.txt";
 const string mdfLocation = 		"/home/rodger/school/CS5700/pj1/src/PJ01_runfiles/";
 const string logFileLocation = 	"/home/rodger/school/CS5700/pj1/src/outputfiles/";
+const string asciiSymbols = " !\"#$%&\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_abcdefghijklmnopqrstuvwxyz{|}~";
 
+//data structure to hold transition
 struct transition{
 	int start;
 	string character;
 	int end;
 };
 
+//remove duplicates from string
 string remove_duplicates(std::string s) {
     if (s.begin() == s.end()) return s;
     auto no_duplicates = s.begin(); 
@@ -39,10 +43,60 @@ string remove_duplicates(std::string s) {
     return s;
 }
 
+//DFA accept test
 bool accept_string(string curString, vector<int>& accList, vector<transition>& TransList){
 	bool retval = false;
 	//start state
 	int state = 0;
+	//cout << "\n\nString to test: "<<curString<< "\n";
+	//cout << "String length: "<<curString.size()<< "\n";
+	/*
+	//test transition list
+	cout << "transition list: start, char, end"  << "\n";
+	for (int k = 0; k < TransList.size(); k++){
+			cout << TransList[k].start << " ";
+			cout << TransList[k].character << " ";
+			cout << TransList[k].end << " ";
+			cout << "\n";
+	}
+	*/
+	//step through string characters
+	for (int i = 0; i < curString.size(); i++){
+		//cout << "current state: " << state << "\n";
+		
+		//cout << "current symbol: " << curString[i] << "\n";
+		//look for transition from current state with current symbol
+		//cout << "i: " << i << " char: " << curString[i] <<"\n";
+	
+		string s; s.push_back(curString[i]);
+		for (int j = 0; j < TransList.size(); j++){
+			if ((TransList[j].start == state) && (TransList[j].character == s)){
+			//	cout<< "found transition match\n";
+			//	cout<< "current state: " << state << "\n";
+			//	cout<< "TransList: start, symbol, end\n";
+			//	cout<<	TransList[j].start << " " << TransList[j].character << " " << TransList[j].end << "\n";
+				state = TransList[j].end;
+			//	cout<< "new state: " << state << "\n";
+				break;
+			}
+		}
+	}
+	for (int j = 0; j < accList.size(); j++){
+		if(accList[j] == state){
+			retval = true;
+		}
+	}
+	
+
+	return retval;
+} /*
+//NFA accept test
+bool accept_stringNFA(string curString, vector<int>& accList, vector<transition>& TransList){
+	bool retval = false;
+	//start state
+	int state = 0;
+
+		
 	
 	//step through string characters
 	for (int i = 0; i < curString.length(); i++){
@@ -64,6 +118,8 @@ bool accept_string(string curString, vector<int>& accList, vector<transition>& T
 
 	return retval;
 }
+*/
+
 int main() {
 	
 	//define vector to hold test strings
@@ -91,11 +147,15 @@ int main() {
 	
 	//read inputfile
 	string temp;
+	while(inputFile>>temp){
+		testStringsList.push_back(temp);
+	}
+	/*
 	while(!inputFile.eof()){
 		inputFile>>temp; 
 		testStringsList.push_back(temp);
 	}
-	
+	*/
 	//close inputfile
 	inputFile.close();
 	
@@ -290,26 +350,66 @@ int main() {
 			cout<< finalAlphabet<< "\n";
 			log << "Alphabet: " << finalAlphabet << "\n";
 			
+			/*
+			 * remove current alphabet from asciiSymbols
+			 * create transitions from delta list to state 255 for 
+			 * every symbol
+			 * asciiSymbols
+			 */
+			
+			string trapSymbols;
+			//cout << asciiSymbols<< "\n";
+			//cout << trapSymbols<< "\n";
+			
+			//build list of trap symbols not in alphabet
+			for (int j = 0; j < asciiSymbols.length(); j++){
+				bool add = true;
+				for (int i = 0; i < finalAlphabet.length(); i++){
+					if (asciiSymbols[j]==finalAlphabet[i]){
+						//don't add
+						add = false;
+					}
+				}
+			
+				if (add) {trapSymbols+=asciiSymbols[j];} 	            //temporarily remove for testing
+			}
+
+			//cout << trapSymbols<< "\n";
+			//loop through all states and add traps for anything not in language
+			for (int i=0; i< 256; i++){
+				for (int j = 0; j < trapSymbols.length(); j++){
+					transition trapTransition;
+					trapTransition.start = i;
+					trapTransition.character = trapSymbols[j];
+					trapTransition.end = 255;
+					//cout<<"Add transition\n" ;
+					transitionList.push_back(trapTransition);
+				}
+			}
+				
+			
 			//loop through test strings and test in current machine
 			for (int i = 0; i < testStringsList.size(); i++){
+				string currentString = testStringsList[i];
+				bool stringPasses;
+				//cout<<currentString<< "\n";
+				
 				if (NFA){
 					//ignore NFA for now
-					break;
-				}
-				
-				string currentString = testStringsList[i];
-				//cout<<currentString<< "\n";
-				bool stringPasses;
-				stringPasses = accept_string(currentString, acceptList,transitionList);
-
-				if (stringPasses){
-					cout<<"pass string: "<< currentString << "\n";
-					log<<currentString<< "\n";
+					
 				} else{
-					//cout<<"fail string: "<< currentString << "\n";
-				}
+					
+					stringPasses = accept_string(currentString, acceptList,transitionList);
+	
+					if (stringPasses){
+						//cout<<"pass string: "<< currentString << "\n";
+						log<<currentString<< "\n";
+					} else{
+						//cout<<"fail string: "<< currentString << "\n";
+					}
+					
 				
-
+				}
 			}
 			
 			//close MDF & logfile & clear acceptlist
@@ -326,7 +426,7 @@ int main() {
 		//cout << "test5"  << "\n";	
 
 		//prevent infinite loop
-		if (mdfCount == 4){ 
+		if (mdfCount ==1){ 
 			break;
 		}
 		mdfCount++;
