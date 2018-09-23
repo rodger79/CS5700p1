@@ -1,6 +1,3 @@
-a
-aa
-aaa
-ababa
-abab
-aaac
+01
+001
+0

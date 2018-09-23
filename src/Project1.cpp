@@ -18,8 +18,8 @@
 using namespace std;
 
 //absolute directory locations
-const string inputLocation = 	"/home/rodger/school/CS5700/pj1/src/PJ01_runfiles/input.txt";
-//const string inputLocation = 	"/home/rodger/school/CS5700/pj1/src/PJ01_runfiles/inputtoy.txt";
+//const string inputLocation = 	"/home/rodger/school/CS5700/pj1/src/PJ01_runfiles/input.txt";
+const string inputLocation = 	"/home/rodger/school/CS5700/pj1/src/PJ01_runfiles/inputtoy.txt";
 const string mdfLocation = 		"/home/rodger/school/CS5700/pj1/src/PJ01_runfiles/";
 const string logFileLocation = 	"/home/rodger/school/CS5700/pj1/src/outputfiles/";
 const string asciiSymbols = " !\"#$%&\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_abcdefghijklmnopqrstuvwxyz{|}~";
@@ -29,6 +29,12 @@ struct transition{
 	int start;
 	string character;
 	int end;
+};
+
+//data structure to hold NFA branches
+struct machineState{
+	int state;
+	string testString;
 };
 
 //remove duplicates from string
@@ -89,36 +95,131 @@ bool accept_string(string curString, vector<int>& accList, vector<transition>& T
 	
 
 	return retval;
-} /*
+} 
 //NFA accept test
 bool accept_stringNFA(string curString, vector<int>& accList, vector<transition>& TransList){
+	
+
+	
 	bool retval = false;
 	//start state
 	int state = 0;
+	vector <machineState> branchList;
+	machineState mainBranch;
+	mainBranch.state = state;
+	mainBranch.testString = curString;
+	branchList.push_back(mainBranch);
+	string E; E.push_back('`');
+	
+	while (true){
+
+		if (branchList.empty()){
+			break;
+		}
+		//cout << "branchlist size: " << branchList.size() << "\n";
+		//clear out working state from branch list
+		machineState m = branchList[0];
+		branchList.erase(branchList.begin());
+		
+		//step through string characters
+		for (int i = 0; i < m.testString.size(); i++){
+
+		    int tranCount = 0; //if >0 spawn new branch
+		    
+		    int mainBranchState = m.state; //placeholder to hold new state until 
+			//cout << "current state & testString\n" << m.state << " "<< m.testString[i] << "\n\n";
+
+
+
+			for (int j = 0; j < TransList.size(); j++){
+				//cout << "current transition list char: " << TransList[j].character << "\n\n";
+				//look for epsilon transitions
+				
+
+				
+				
+				
+				//look for transitions matching current symbol
+				string s; s.push_back(m.testString[i]);
+				//cout<< "test string s: " << s << "\n";
+				if ((TransList[j].start == m.state) && (TransList[j].character == s)){
+					cout<< "found transition match: ";
+					if (tranCount == 0){
+						//if transition count 0, main branch continue
+						mainBranchState = TransList[j].end;
+						cout<< "main branch new state: " << TransList[j].end << "\n";
+						
+					} else{
+						//else transition count > 0 create fork
+						cout<< "creating multiple path branch: "; 
+						cout<< "new state: " << TransList[j].end << "\n";
+						
+						string branchString;
+						for (int k = i + 1; k <  m.testString.size(); k++){
+							branchString += m.testString[j];
+						}
+						machineState newBranch;
+						newBranch.state = TransList[j].end;
+						newBranch.testString = branchString;
+						branchList.push_back(newBranch);
+
+					}
+					tranCount++;
+
+				}
+			}
+			m.state= mainBranchState;
+			
+			//look for epsilon transitions from current state and create fork
+
+			//cout<< "test string E: " << E << "\n";
+			for (int j = 0; j < TransList.size(); j++){
+				if ((TransList[j].start == m.state) && (TransList[j].character == E)){
+					cout<< "E branch new state: " << TransList[j].end << "\n";
+
+					//string branchString= m.testString;
+					string branchString;
+					for (int k = i + 1; k <  m.testString.size(); k++){
+						branchString += m.testString[j];
+					}
+					machineState newEBranch;
+					newEBranch.state = TransList[j].end;
+					newEBranch.testString = branchString;
+					branchList.push_back(newEBranch);
+				}
+			}
+
+			
+		}
+		
+		//if string is empty still need to look for epsilon transition
+		if (m.testString.size() == 0)
+		{
+			cout<< "teststring empty, no loop, last check for epsilon\n";
+			for (int j = 0; j < TransList.size(); j++){
+				if ((TransList[j].start == m.state) && (TransList[j].character == E)){
+					cout<< "E branch new state: " << TransList[j].end << "\n";
+					//string branchString= m.testString;
+					string branchString = "";
+					machineState newEBranch;
+					newEBranch.state = TransList[j].end;
+					newEBranch.testString = branchString;
+					branchList.push_back(newEBranch);
+				}
+			}
+		}
+		
 
 		
-	
-	//step through string characters
-	for (int i = 0; i < curString.length(); i++){
-		string currentSymbol = &curString[i];
-		//look for transition from current state with current symbol
-		//cout << "i: " << i << " char: " << curString[i] <<"\n";
-		for (int j = 0; j < TransList.size(); j++){
-			if (TransList[j].start == state && TransList[j].character == currentSymbol){
-				state = TransList[j].end;
+		for (int j = 0; j < accList.size(); j++){
+			if(accList[j] == m.state){
+				retval = true;
 			}
 		}
 	}
-	for (int j = 0; j < accList.size(); j++){
-		if(accList[j] == state){
-			retval = true;
-		}
-	}
-	
 
 	return retval;
 }
-*/
 
 int main() {
 	
@@ -130,9 +231,13 @@ int main() {
 	vector <int> acceptList;
 	acceptList.clear();
 	
-	//define vector to hold accept states
+	//define vector to hold all transitions
 	vector <transition> transitionList;
 	transitionList.clear();
+	
+	//create transition list for explicit definitions
+	vector <transition> explicitTransitionList;
+	explicitTransitionList.clear();
 	
 	//open input string file
 	ifstream inputFile(inputLocation.c_str());
@@ -171,7 +276,7 @@ int main() {
 	}
 	
 	//open Machine Description Files loop
-	int mdfCount = 0;
+	int mdfCount = 31;
 	//cout<<"test1"<<"\n";
 	while (true){
 		//cout<<"test2"<<"\n";
@@ -202,17 +307,14 @@ int main() {
 		//If valid open MDF 
 		//cout<<"test3"<<"\n";
 		if (mdfFile){   									
-			//cout<<"test4"<<"\n";
-			//cout << "mdf: " + filename + " opened" << endl;
+
 			//Load MDF into memory
 			cout << "mdf test: " + filename + " opened" << endl;
 			int i = 0;
 			string temp;
-			//while(!mdfFile.eof()){
 			
 			while(mdfFile >> temp){
 				
-				//cout << temp  << endl;
 				
 				//convert accept list string to char array for tokenizing
 				int n = temp.length();
@@ -222,11 +324,11 @@ int main() {
 				//read in accept States to acceptList
 				if (i == 0){
 					char* nums;
-					nums = strtok(tempCharAr,"{,}");
+					nums = strtok(tempCharAr,"{}");
 					while (nums != NULL){
 						acceptList.push_back(atoi(nums));
 						//printf ("%s\n",nums);
-						nums = strtok (NULL, "{,}");
+						nums = strtok (NULL, "{}");
 					}
 
 				}
@@ -241,50 +343,44 @@ int main() {
 					while (nums != NULL){
 						//printf ("%s\n",nums);
 						tranStates[j] = *nums;
+						//cout<<nums<< "\n";
 						nums = strtok (NULL, ",");
 						j++;
 					}
 					
 					transition tempTransition;
-					tempTransition.start = atoi(&tranStates[0]);
-					tempTransition.character = tranStates[1];
-					tempTransition.end = atoi(&tranStates[2]);
-					//cout<<"Add transition\n" ;
-					transitionList.push_back(tempTransition);
 					
+					char tempStart[2]= {tranStates[0], '\0'};
+					tempTransition.start = atoi(tempStart);
+					
+					tempTransition.character = tranStates[1];
+					
+					char tempEnd[2]= {tranStates[2], '\0'};
+					tempTransition.end = atoi(tempEnd);
+					
+					//cout<<"Add transition.start: " <<tempTransition.start <<"\n" ;
+					transitionList.push_back(tempTransition);
+					explicitTransitionList.push_back(tempTransition);
 				}
 				i++;
 				
 			}
-			
-			/*
+			/*	
 			//test accept list
-			cout << "accept list"  << "\n";
+			cout << "accept list: ";
 			if (acceptList.empty()){
 				cout << "accept list empty"  << "\n";		
 			} else{
 				for (int i = 0; i < acceptList.size(); i++){
-						cout << acceptList[i] << "\n";
+						cout << acceptList[i] << " ";
 				}
+				cout << "\n";
 			}	
 			
 			
 			
-			//test transition list
-			cout << "transition list: start, char, end"  << "\n";
-			if (acceptList.empty()){
-				cout << "transition list empty"  << "\n";		
-			} else{
-				//cout << "transition list size: "  << transitionList.size() << "\n";		
-				for (int k = 0; k < transitionList.size(); k++){
-						cout << transitionList[k].start << " ";
-						cout << transitionList[k].character << " ";
-						cout << transitionList[k].end << " ";
-						cout << "\n";
-				}
-				
-			}
-			*/
+
+		*/
 			//determine if machine is DFA/NFA/INVALID
 			//look for epsilon transitions
 			bool hasEpsilon = false;
@@ -319,11 +415,13 @@ int main() {
 
 				}
 			}
+			
+
 			bool NFA = false;
 			//if Epsilon or matching symbol/stated identified NFA
 			if (hasEpsilon || hasMatch){
 				log << "Valid: NFA" << "\n";
-				cout<< "hasEpsilon or symbol/state repeat" << "\n";
+				//cout<< "hasEpsilon or symbol/state repeat" << "\n";
 				NFA = true;
 			}else{
 				log << "Valid: DFA" << "\n";
@@ -343,24 +441,108 @@ int main() {
 			}
 			/* debug
 			cout<< Alphabet<< "\n";
-			cout<<remove_duplicates(Alphabet)<< "\n";
 			*/
 			sort(Alphabet.begin(), Alphabet.end());
 			string finalAlphabet = remove_duplicates(Alphabet);
-			cout<< finalAlphabet<< "\n";
+			//cout<< finalAlphabet<< "\n";
 			log << "Alphabet: " << finalAlphabet << "\n";
 			
 			/*
+			//test explicit transition list
+			cout << "exp transition list: start, char, end"  << "\n";
+			for (int k = 0; k < explicitTransitionList.size(); k++){
+					cout << explicitTransitionList[k].start << " ";
+					cout << explicitTransitionList[k].character << " ";
+					cout << explicitTransitionList[k].end << " ";
+					cout << "\n";
+			}
+			
+			//test explicit transition list
+			cout << "full transition list: start, char, end"  << "\n";
+			for (int k = 0; k < transitionList.size(); k++){
+					cout << transitionList[k].start << " ";
+					cout << transitionList[k].character << " ";
+					cout << transitionList[k].end << " ";
+					cout << "\n";
+			}
+			//test transition list
+			cout << "transition list: start, char, end"  << "\n";
+			if (acceptList.empty()){
+				cout << "transition list empty"  << "\n";		
+			} else{
+				//cout << "transition list size: "  << transitionList.size() << "\n";		
+				for (int k = 0; k < transitionList.size(); k++){
+					
+					if (transitionList[k].start == 1 && transitionList[k].character == "1"){
+						cout << transitionList[k].start << " ";
+						cout << transitionList[k].character << " ";
+						cout << transitionList[k].end << " ";
+						cout << "\n";
+					}
+				}
+				
+			}
+			//test transition list
+			cout << "test of specific mapping list: start, char, end"  << "\n";
+			if (acceptList.empty()){
+				cout << "transition list empty"  << "\n";		
+			} else{
+				//cout << "transition list size: "  << transitionList.size() << "\n";		
+				for (int k = 0; k < transitionList.size(); k++){
+					
+					if (transitionList[k].start == 1 && transitionList[k].character == "1"){
+						cout << transitionList[k].start << " ";
+						cout << transitionList[k].character << " ";
+						cout << transitionList[k].end << " ";
+						cout << "\n";
+					}
+				}
+				
+			}*/
+
+			//loop through all states and add traps for anything not in language
+			for (int i=0; i< 256; i++){
+				for (int j = 0; j < asciiSymbols.length(); j++){
+					transition trapTransition;
+					trapTransition.start = i;
+					trapTransition.character = asciiSymbols[j];
+					trapTransition.end = 255;
+					
+					bool addFlag = true;
+					//check here to see if explicitly defined already
+					// 		then don't add 
+					for (int k = 0; k < explicitTransitionList.size(); k++){
+
+						if ((explicitTransitionList[k].start == trapTransition.start) &&
+								(explicitTransitionList[k].character == trapTransition.character)){
+							//already explicitly defined
+							addFlag = false;
+						}else{
+							//not explicitly defined, map to trap state
+							
+						}
+					}
+					if (addFlag){
+						transitionList.push_back(trapTransition);
+					}
+				}
+			}
+			
+
+			/* error, need all symbols remove this section
+			 *
 			 * remove current alphabet from asciiSymbols
 			 * create transitions from delta list to state 255 for 
 			 * every symbol
 			 * asciiSymbols
 			 */
 			
+			/*
 			string trapSymbols;
 			//cout << asciiSymbols<< "\n";
 			//cout << trapSymbols<< "\n";
 			
+
 			//build list of trap symbols not in alphabet
 			for (int j = 0; j < asciiSymbols.length(); j++){
 				bool add = true;
@@ -373,42 +555,34 @@ int main() {
 			
 				if (add) {trapSymbols+=asciiSymbols[j];} 	            //temporarily remove for testing
 			}
+	
+*/
 
-			//cout << trapSymbols<< "\n";
-			//loop through all states and add traps for anything not in language
-			for (int i=0; i< 256; i++){
-				for (int j = 0; j < trapSymbols.length(); j++){
-					transition trapTransition;
-					trapTransition.start = i;
-					trapTransition.character = trapSymbols[j];
-					trapTransition.end = 255;
-					//cout<<"Add transition\n" ;
-					transitionList.push_back(trapTransition);
-				}
-			}
 				
 			
 			//loop through test strings and test in current machine
 			for (int i = 0; i < testStringsList.size(); i++){
 				string currentString = testStringsList[i];
 				bool stringPasses;
-				//cout<<currentString<< "\n";
+				cout<<currentString<< "\n";
 				
 				if (NFA){
 					//ignore NFA for now
+					stringPasses = accept_stringNFA(currentString, acceptList,transitionList);
 					
-				} else{
 					
+				} 
+				else{
+					//DFA: should be able to remove once NFA function working
 					stringPasses = accept_string(currentString, acceptList,transitionList);
-	
-					if (stringPasses){
-						//cout<<"pass string: "<< currentString << "\n";
-						log<<currentString<< "\n";
-					} else{
-						//cout<<"fail string: "<< currentString << "\n";
-					}
-					
 				
+				}
+				
+				if (stringPasses){
+					cout<<"accept string: "<< currentString << "\n";
+					log<<currentString<< "\n";
+				} else{
+					cout<<"fail string: "<< currentString << "\n";
 				}
 			}
 			
@@ -423,14 +597,12 @@ int main() {
 			break;
 		}
 
-		//cout << "test5"  << "\n";	
-
 		//prevent infinite loop
-		if (mdfCount ==1){ 
-			break;
+		if (mdfCount ==0){ 
+			//break;
 		}
 		mdfCount++;
-		//cout << "test6"  << "\n";
+
 	}
 	
 	return 0;
