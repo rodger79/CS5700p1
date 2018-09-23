@@ -1,0 +1,42 @@
+Valid: DFA
+Alphabet: abc
+Accepted Strings: 369 / 10351
+Valid: DFA
+Alphabet: ab
+Accepted Strings: 404 / 10351
+Valid: DFA
+Alphabet: ab
+Accepted Strings: 404 / 10351
+Valid: DFA
+Alphabet: 01
+Accepted Strings: 284 / 10351
+Valid: DFA
+Alphabet: 01
+Accepted Strings: 624 / 10351
+Valid: DFA
+Alphabet: 01
+Accepted Strings: 624 / 10351
+Valid: NFA
+Alphabet: 01
+Accepted Strings: 42 / 10351
+Valid: NFA
+Alphabet: 01
+Accepted Strings: 0 / 10351
+Valid: DFA
+Alphabet: abcdefghijklmnopqrstuvwxyz
+Accepted Strings: 0 / 10351
+Valid: DFA
+Alphabet: abcdefghijklmnopqrstuvwxyz
+Accepted Strings: 2609 / 10351
+Valid: NFA
+Alphabet: 0123456789ABCDEFabcdef
+Accepted Strings: 0 / 10351
+Valid: DFA
+Alphabet: 01
+Accepted Strings: 330 / 10351
+Valid: DFA
+Alphabet: 012
+Accepted Strings: 2264 / 10351
+Valid: DFA
+Alphabet: 012
+Accepted Strings: 481 / 10351
