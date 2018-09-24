@@ -1,3 +1,4 @@
-Valid: NFA
+Valid: DFA
+States: 8
 Alphabet: 01
-Accepted Strings: 0 / 10351
+Accepted Strings: 87 / 10298

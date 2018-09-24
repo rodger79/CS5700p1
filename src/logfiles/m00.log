@@ -1,3 +1,4 @@
 Valid: DFA
+States: 2
 Alphabet: abc
-Accepted Strings: 369 / 10351
+Accepted Strings: 369 / 10298

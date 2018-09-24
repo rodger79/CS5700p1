@@ -1,3 +1,4 @@
 Valid: DFA
+States: 5
 Alphabet: ab
-Accepted Strings: 404 / 10351
+Accepted Strings: 404 / 10298

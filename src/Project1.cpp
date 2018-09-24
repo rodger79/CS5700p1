@@ -21,8 +21,8 @@ using namespace std;
 const string inputLocation = 	"/home/rodger/school/CS5700/pj1/src/PJ01_runfiles/input.txt";
 //const string inputLocation = 	"/home/rodger/school/CS5700/pj1/src/PJ01_runfiles/inputtoy.txt";
 const string mdfLocation = 		"/home/rodger/school/CS5700/pj1/src/PJ01_runfiles/";
-const string outputFileLocation = 	"/home/rodger/school/CS5700/pj1/src/outputfiles1/";
-const string logFileLocation = 	"/home/rodger/school/CS5700/pj1/src/logfiles1/";
+const string outputFileLocation = 	"/home/rodger/school/CS5700/pj1/src/outputfiles/";
+const string logFileLocation = 	"/home/rodger/school/CS5700/pj1/src/logfiles/";
 const string asciiSymbols = " !\"#$%&\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_abcdefghijklmnopqrstuvwxyz{|}~";
 
 //data structure to hold transition
@@ -240,6 +240,10 @@ int main() {
 		vector <int> acceptList;
 		acceptList.clear();
 		
+		//define vector to hold all states
+		vector <int> stateList;
+		stateList.clear();
+		
 		//define vector to hold all transitions
 		vector <transition> transitionList;
 		transitionList.clear();
@@ -331,7 +335,8 @@ int main() {
 				i++;
 				
 			}
-
+			
+			
 			//determine if machine is DFA/NFA/INVALID
 			//look for epsilon transitions
 			bool hasEpsilon = false;
@@ -378,6 +383,28 @@ int main() {
 				log << "Valid: DFA" << "\n";
 			}
 			//else invalid, tokenizer should handle missing tokens
+			
+
+			//need to determine the number of states
+			for (int i = 0; i < explicitTransitionList.size(); i++){
+
+						stateList.push_back(explicitTransitionList[i].start);
+
+						stateList.push_back(explicitTransitionList[i].end);
+
+			}
+			
+			sort( stateList.begin(), stateList.end() );
+			stateList.erase( unique( stateList.begin(), stateList.end() ), stateList.end() );
+			
+			/*
+			cout<< "Statelist count: " << stateList.size() << "\n";
+			for (int i = 0; i < stateList.size(); i++){
+				cout<< i << " ";
+			}
+			cout<< endl;*/
+			
+			log <<"States: " << stateList.size()<< "\n";
 			
 			//identify machine alphabet
 			string Alphabet;
